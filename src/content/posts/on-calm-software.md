@@ -2,6 +2,7 @@
 title: "On Calm Software"
 description: "Most software demands attention. The best software respects it."
 date: 2026-01-15
+tags: ["design", "philosophy"]
 ---
 
 Open most applications and they compete for your attention. Notifications, badges, banners, modals. Every surface is an opportunity to interrupt.

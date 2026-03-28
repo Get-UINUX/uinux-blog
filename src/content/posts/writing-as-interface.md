@@ -2,6 +2,7 @@
 title: "Writing as Interface"
 description: "The best interface for communicating complex ideas is still plain text."
 date: 2026-01-02
+tags: ["writing", "design"]
 ---
 
 We spend enormous effort designing interfaces. Layouts, components, interactions, animations. All of it in service of communicating something to someone.

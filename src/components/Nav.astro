@@ -5,6 +5,7 @@ const currentPath = Astro.url.pathname;
 <nav class="nav">
   <a href="/" class="nav-brand">UINUX Blog</a>
   <div class="nav-links">
+    <a href="/tags" class:list={[{ active: currentPath.startsWith("/tags") }]}>Tags</a>
     <a href="/search" class:list={[{ active: currentPath === "/search" || currentPath === "/search/" }]}>Search</a>
     <a href="/about" class:list={[{ active: currentPath === "/about" || currentPath === "/about/" }]}>About</a>
     <a href="/rss.xml">RSS</a>

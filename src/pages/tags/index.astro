@@ -1,0 +1,65 @@
+---
+import Layout from "../../components/Layout.astro";
+import Heading from "../../components/Heading.astro";
+import { getCollection } from "astro:content";
+
+const posts = await getCollection("posts");
+const tagCounts = new Map<string, number>();
+for (const post of posts) {
+  for (const tag of post.data.tags) {
+    tagCounts.set(tag, (tagCounts.get(tag) || 0) + 1);
+  }
+}
+const tags = [...tagCounts.entries()].sort((a, b) => b[1] - a[1]);
+---
+
+<Layout title="Tags — UINUX Blog" description="Browse posts by tag.">
+  <section class="tags-page">
+    <Heading as="h1">Tags</Heading>
+    <ul class="tag-list">
+      {tags.map(([tag, count]) => (
+        <li>
+          <a href={`/tags/${tag}`} class="tag-link">
+            {tag} <span class="tag-count">({count})</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+</Layout>
+
+<style>
+  .tags-page {
+    max-width: var(--width-content);
+  }
+
+  .tag-list {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    margin-top: var(--space-lg);
+  }
+
+  .tag-link {
+    font-family: var(--font-heading);
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    border: 1px solid var(--color-border);
+    padding: 0.25rem 0.75rem;
+    border-radius: 3px;
+    transition: color 0.15s ease, border-color 0.15s ease;
+  }
+
+  .tag-link:hover {
+    color: var(--color-text);
+    border-color: var(--color-text-tertiary);
+  }
+
+  .tag-count {
+    color: var(--color-text-tertiary);
+    font-size: 0.75rem;
+  }
+</style>

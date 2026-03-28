@@ -2,6 +2,7 @@
 title: "Systems, Not Themes"
 description: "Why we build design systems instead of selling themes, and what that means for long-term product thinking."
 date: 2026-02-01
+tags: ["design", "systems"]
 ---
 
 There is a difference between a theme and a system.

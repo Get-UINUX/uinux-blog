@@ -23,6 +23,7 @@ const jsonLd = {
   "description": post.data.description,
   "datePublished": post.data.date.toISOString(),
   "url": postUrl,
+  "keywords": post.data.tags.length > 0 ? post.data.tags.join(", ") : undefined,
   "mainEntityOfPage": {
     "@type": "WebPage",
     "@id": postUrl,
@@ -42,7 +43,7 @@ const jsonLd = {
 
 <Layout title={`${post.data.title} — UINUX Blog`} description={post.data.description} ogType="article">
   <script slot="head" type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
-  <Article title={post.data.title} date={post.data.date} description={post.data.description}>
+  <Article title={post.data.title} date={post.data.date} description={post.data.description} tags={post.data.tags}>
     <Content />
   </Article>
 </Layout>

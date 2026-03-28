@@ -6,9 +6,10 @@ interface Props {
   title: string;
   date: Date;
   description: string;
+  tags?: string[];
 }
 
-const { title, date, description } = Astro.props;
+const { title, date, description, tags = [] } = Astro.props;
 
 const formattedDate = date.toLocaleDateString("en-US", {
   year: "numeric",
@@ -23,6 +24,13 @@ const formattedDate = date.toLocaleDateString("en-US", {
     <p class="article-meta">
       <time datetime={date.toISOString()}>{formattedDate}</time>
     </p>
+    {tags.length > 0 && (
+      <div class="article-tags">
+        {tags.map((tag) => (
+          <a href={`/tags/${tag}`} class="tag">{tag}</a>
+        ))}
+      </div>
+    )}
   </header>
   <Prose>
     <slot />
@@ -43,5 +51,28 @@ const formattedDate = date.toLocaleDateString("en-US", {
     font-size: 0.8125rem;
     color: var(--color-text-tertiary);
     margin-top: var(--space-sm);
+  }
+
+  .article-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    margin-top: var(--space-sm);
+  }
+
+  .tag {
+    font-family: var(--font-heading);
+    font-size: 0.75rem;
+    color: var(--color-text-tertiary);
+    text-decoration: none;
+    border: 1px solid var(--color-border);
+    padding: 0.125rem 0.5rem;
+    border-radius: 3px;
+    transition: color 0.15s ease, border-color 0.15s ease;
+  }
+
+  .tag:hover {
+    color: var(--color-text);
+    border-color: var(--color-text-tertiary);
   }
 </style>

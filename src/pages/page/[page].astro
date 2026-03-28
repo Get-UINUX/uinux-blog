@@ -1,64 +1,61 @@
 ---
-import Layout from "../components/Layout.astro";
-import Heading from "../components/Heading.astro";
+import Layout from "../../components/Layout.astro";
+import Heading from "../../components/Heading.astro";
 import { getCollection } from "astro:content";
+import type { GetStaticPathsOptions } from "astro";
 
-const PAGE_SIZE = 10;
+export async function getStaticPaths({ paginate }: GetStaticPathsOptions) {
+  const posts = (await getCollection("posts")).sort(
+    (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+  );
+  const pages = paginate(posts, { pageSize: 10 });
+  // Skip page 1 — home page (index.astro) handles it
+  return pages.filter((p) => p.params.page !== undefined);
+}
 
-const allPosts = (await getCollection("posts")).sort(
-  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
-);
-
-const posts = allPosts.slice(0, PAGE_SIZE);
-const totalPages = Math.ceil(allPosts.length / PAGE_SIZE);
+const { page } = Astro.props;
 ---
 
-<Layout title="UINUX Blog">
-  <script slot="head" type="application/ld+json" set:html={JSON.stringify({
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": "UINUX Blog",
-    "description": "Writing about systems, design, and building with restraint.",
-    "url": Astro.site?.href,
-  })} />
+<Layout title={`Page ${page.currentPage} — UINUX Blog`}>
   <section class="home">
     <header class="home-header">
       <Heading as="h1">UINUX Blog</Heading>
       <p class="home-tagline">Writing about systems, design, and building with restraint.</p>
     </header>
     <ul class="post-list">
-      {
-        posts.map((post) => {
-          const formattedDate = post.data.date.toLocaleDateString("en-US", {
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-          });
-          return (
-            <li class="post-item">
-              <a href={`/posts/${post.id}`}>
-                <span class="post-title">{post.data.title}</span>
-                <span class="post-description">{post.data.description}</span>
-                <time datetime={post.data.date.toISOString()}>{formattedDate}</time>
-              </a>
-              {post.data.tags.length > 0 && (
-                <div class="post-tags">
-                  {post.data.tags.map((tag) => (
-                    <a href={`/tags/${tag}`} class="tag">{tag}</a>
-                  ))}
-                </div>
-              )}
-            </li>
-          );
-        })
-      }
+      {page.data.map((post) => {
+        const formattedDate = post.data.date.toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        });
+        return (
+          <li class="post-item">
+            <a href={`/posts/${post.id}`}>
+              <span class="post-title">{post.data.title}</span>
+              <span class="post-description">{post.data.description}</span>
+              <time datetime={post.data.date.toISOString()}>{formattedDate}</time>
+            </a>
+            {post.data.tags.length > 0 && (
+              <div class="post-tags">
+                {post.data.tags.map((tag) => (
+                  <a href={`/tags/${tag}`} class="tag">{tag}</a>
+                ))}
+              </div>
+            )}
+          </li>
+        );
+      })}
     </ul>
-    {totalPages > 1 && (
-      <nav class="pagination" aria-label="Pagination">
-        <span class="pagination-info">Page 1 of {totalPages}</span>
-        <a href="/page/2" class="pagination-link">Older &rarr;</a>
-      </nav>
-    )}
+    <nav class="pagination" aria-label="Pagination">
+      {page.url.prev && (
+        <a href={page.currentPage === 2 ? "/" : page.url.prev} class="pagination-link">&larr; Newer</a>
+      )}
+      <span class="pagination-info">Page {page.currentPage} of {page.lastPage}</span>
+      {page.url.next && (
+        <a href={page.url.next} class="pagination-link">Older &rarr;</a>
+      )}
+    </nav>
   </section>
 </Layout>
 
