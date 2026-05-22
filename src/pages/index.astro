@@ -1,13 +1,11 @@
 ---
 import Layout from "../components/Layout.astro";
 import Heading from "../components/Heading.astro";
-import { getCollection } from "astro:content";
+import { getPublishedPosts } from "../lib/posts";
 
 const PAGE_SIZE = 10;
 
-const allPosts = (await getCollection("posts")).sort(
-  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
-);
+const allPosts = await getPublishedPosts();
 
 const posts = allPosts.slice(0, PAGE_SIZE);
 const totalPages = Math.ceil(allPosts.length / PAGE_SIZE);

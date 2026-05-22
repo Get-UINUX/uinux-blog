@@ -101,4 +101,20 @@
   .prose :global(strong) {
     font-weight: 600;
   }
+
+  .prose :global(.heading-anchor) {
+    opacity: 0;
+    color: var(--color-text-tertiary);
+    text-decoration: none;
+    font-weight: 400;
+    font-family: var(--font-heading);
+    font-size: 0.8em;
+    margin-left: 0.375em;
+    transition: opacity 0.15s ease;
+  }
+
+  .prose :global(h2:hover .heading-anchor),
+  .prose :global(h3:hover .heading-anchor) {
+    opacity: 1;
+  }
 </style>

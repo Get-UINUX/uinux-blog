@@ -1,20 +1,31 @@
 ---
 import Layout from "../../components/Layout.astro";
 import Article from "../../components/Article.astro";
-import { getCollection, render } from "astro:content";
+import { render } from "astro:content";
+import { getPublishedPosts, readingTime } from "../../lib/posts";
 
 export async function getStaticPaths() {
-  const posts = await getCollection("posts");
-  return posts.map((post) => ({
+  const posts = await getPublishedPosts();
+  return posts.map((post, index) => ({
     params: { slug: post.id },
-    props: post,
+    props: {
+      post,
+      prevPost: index > 0
+        ? { id: posts[index - 1].id, title: posts[index - 1].data.title }
+        : undefined,
+      nextPost: index < posts.length - 1
+        ? { id: posts[index + 1].id, title: posts[index + 1].data.title }
+        : undefined,
+    },
   }));
 }
 
-const post = Astro.props;
-const { Content } = await render(post);
+const { post, prevPost, nextPost } = Astro.props;
+const { Content, headings } = await render(post);
 
+const postReadingTime = readingTime(post.body);
 const postUrl = new URL(`/posts/${post.id}`, Astro.site).href;
+const ogImage = `/og/${post.id}.png`;
 
 const jsonLd = {
   "@context": "https://schema.org",
@@ -22,6 +33,7 @@ const jsonLd = {
   "headline": post.data.title,
   "description": post.data.description,
   "datePublished": post.data.date.toISOString(),
+  ...(post.data.updatedDate && { "dateModified": post.data.updatedDate.toISOString() }),
   "url": postUrl,
   "keywords": post.data.tags.length > 0 ? post.data.tags.join(", ") : undefined,
   "mainEntityOfPage": {
@@ -41,9 +53,19 @@ const jsonLd = {
 };
 ---
 
-<Layout title={`${post.data.title} — UINUX Blog`} description={post.data.description} ogType="article">
+<Layout title={`${post.data.title} — UINUX Blog`} description={post.data.description} ogType="article" ogImage={ogImage}>
   <script slot="head" type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
-  <Article title={post.data.title} date={post.data.date} description={post.data.description} tags={post.data.tags}>
+  <Article
+    title={post.data.title}
+    date={post.data.date}
+    updatedDate={post.data.updatedDate}
+    description={post.data.description}
+    tags={post.data.tags}
+    readingTime={postReadingTime}
+    headings={headings}
+    prevPost={prevPost}
+    nextPost={nextPost}
+  >
     <Content />
   </Article>
 </Layout>

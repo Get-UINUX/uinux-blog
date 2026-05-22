@@ -1,6 +1,7 @@
 ---
 import Nav from "./Nav.astro";
 import Footer from "./Footer.astro";
+import BackToTop from "./BackToTop.astro";
 import "../styles/global.css";
 
 interface Props {
@@ -14,11 +15,14 @@ const {
   title,
   description = "A quiet place to read.",
   ogType = "website",
-  ogImage,
+  ogImage = "/og/default.png",
 } = Astro.props;
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 const googleVerification = import.meta.env.PUBLIC_GOOGLE_SITE_VERIFICATION;
+const plausibleDomain = import.meta.env.PUBLIC_PLAUSIBLE_DOMAIN;
+const fathomSiteId = import.meta.env.PUBLIC_FATHOM_SITE_ID;
+const ogImageAbsolute = new URL(ogImage, Astro.site).href;
 ---
 
 <!doctype html>
@@ -26,6 +30,10 @@ const googleVerification = import.meta.env.PUBLIC_GOOGLE_SITE_VERIFICATION;
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+    <meta name="theme-color" content="#fafaf9" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#141413" media="(prefers-color-scheme: dark)" />
     {googleVerification && <meta name="google-site-verification" content={googleVerification} />}
     <title>{title}</title>
     <meta name="description" content={description} />
@@ -37,13 +45,13 @@ const googleVerification = import.meta.env.PUBLIC_GOOGLE_SITE_VERIFICATION;
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonicalURL.href} />
     <meta property="og:site_name" content="UINUX Blog" />
-    {ogImage && <meta property="og:image" content={ogImage} />}
+    <meta property="og:image" content={ogImageAbsolute} />
 
     <!-- Twitter -->
-    <meta name="twitter:card" content={ogImage ? "summary_large_image" : "summary"} />
+    <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
-    {ogImage && <meta name="twitter:image" content={ogImage} />}
+    <meta name="twitter:image" content={ogImageAbsolute} />
 
     <!-- JSON-LD -->
     <slot name="head" />
@@ -55,19 +63,47 @@ const googleVerification = import.meta.env.PUBLIC_GOOGLE_SITE_VERIFICATION;
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:ital,wght@0,400;0,500;0,600;1,400;1,500&family=JetBrains+Mono:wght@400&display=swap"
       rel="stylesheet"
     />
+
+    <!-- Analytics -->
+    {plausibleDomain && (
+      <script defer data-domain={plausibleDomain} src="https://plausible.io/js/script.js" />
+    )}
+    {fathomSiteId && (
+      <script src="https://cdn.usefathom.com/script.js" data-site={fathomSiteId} defer />
+    )}
   </head>
   <body>
+    <a href="#main-content" class="skip-link">Skip to content</a>
     <div class="page">
       <Nav />
-      <main>
+      <main id="main-content">
         <slot />
       </main>
       <Footer />
     </div>
+    <BackToTop />
   </body>
 </html>
 
 <style>
+  .skip-link {
+    position: absolute;
+    top: -100%;
+    left: var(--space-lg);
+    background: var(--color-text);
+    color: var(--color-bg);
+    padding: var(--space-sm) var(--space-md);
+    font-family: var(--font-heading);
+    font-size: 0.875rem;
+    text-decoration: none;
+    border-radius: 0 0 4px 4px;
+    z-index: 100;
+  }
+
+  .skip-link:focus {
+    top: 0;
+  }
+
   .page {
     max-width: var(--width-page);
     margin: 0 auto;

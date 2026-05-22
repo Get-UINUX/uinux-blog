@@ -1,16 +1,14 @@
 ---
 import Layout from "../../components/Layout.astro";
 import Heading from "../../components/Heading.astro";
-import { getCollection } from "astro:content";
+import { getPublishedPosts } from "../../lib/posts";
 import type { GetStaticPathsOptions } from "astro";
 
 export async function getStaticPaths({ paginate }: GetStaticPathsOptions) {
-  const posts = (await getCollection("posts")).sort(
-    (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
-  );
+  const posts = await getPublishedPosts();
   const pages = paginate(posts, { pageSize: 10 });
   // Skip page 1 — home page (index.astro) handles it
-  return pages.filter((p) => p.params.page !== undefined);
+  return pages.filter((p) => p.params.page !== '1');
 }
 
 const { page } = Astro.props;

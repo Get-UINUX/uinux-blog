@@ -1,0 +1,172 @@
+---
+import Layout from "../../../components/Layout.astro";
+import Heading from "../../../components/Heading.astro";
+import { getPublishedPosts } from "../../../lib/posts";
+
+export async function getStaticPaths() {
+  const TAG_PAGE_SIZE = 10;
+  const allPosts = await getPublishedPosts();
+  const tags = [...new Set(allPosts.flatMap((p) => p.data.tags))];
+  const paths: { params: { tag: string; page: string }; props: object }[] = [];
+
+  for (const tag of tags) {
+    const tagPosts = allPosts.filter((p) => p.data.tags.includes(tag));
+    const totalPages = Math.ceil(tagPosts.length / TAG_PAGE_SIZE);
+    for (let pageNum = 2; pageNum <= totalPages; pageNum++) {
+      paths.push({
+        params: { tag, page: String(pageNum) },
+        props: {
+          tag,
+          posts: tagPosts.slice((pageNum - 1) * TAG_PAGE_SIZE, pageNum * TAG_PAGE_SIZE),
+          currentPage: pageNum,
+          totalPages,
+          totalPosts: tagPosts.length,
+        },
+      });
+    }
+  }
+  return paths;
+}
+
+const { tag, posts, currentPage, totalPages, totalPosts } = Astro.props;
+---
+
+<Layout
+  title={`Posts tagged "${tag}" — Page ${currentPage} — UINUX Blog`}
+  description={`All posts tagged "${tag}", page ${currentPage}.`}
+>
+  <section class="tag-page">
+    <Heading as="h1">Tagged: {tag}</Heading>
+    <p class="tag-count">{totalPosts} post{totalPosts !== 1 ? "s" : ""}</p>
+    <ul class="post-list">
+      {posts.map((post) => {
+        const formattedDate = post.data.date.toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        });
+        return (
+          <li class="post-item">
+            <a href={`/posts/${post.id}`}>
+              <span class="post-title">{post.data.title}</span>
+              <span class="post-description">{post.data.description}</span>
+              <time datetime={post.data.date.toISOString()}>{formattedDate}</time>
+            </a>
+          </li>
+        );
+      })}
+    </ul>
+    <nav class="pagination" aria-label="Pagination">
+      <a
+        href={currentPage === 2 ? `/tags/${tag}` : `/tags/${tag}/${currentPage - 1}`}
+        class="pagination-link"
+      >← Newer</a>
+      <span class="pagination-info">Page {currentPage} of {totalPages}</span>
+      {currentPage < totalPages && (
+        <a href={`/tags/${tag}/${currentPage + 1}`} class="pagination-link">Older →</a>
+      )}
+    </nav>
+    <a href="/tags" class="back-link" aria-label="Back to all tags">← All tags</a>
+  </section>
+</Layout>
+
+<style>
+  .tag-page {
+    max-width: var(--width-content);
+  }
+
+  .tag-count {
+    font-family: var(--font-heading);
+    font-size: 0.8125rem;
+    color: var(--color-text-tertiary);
+    margin-bottom: var(--space-xl);
+  }
+
+  .post-list {
+    list-style: none;
+    padding: 0;
+  }
+
+  .post-item {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .post-item:first-child {
+    border-top: 1px solid var(--color-border);
+  }
+
+  .post-item a {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    padding: var(--space-lg) 0;
+    text-decoration: none;
+    color: var(--color-text);
+  }
+
+  .post-item a:hover .post-title {
+    color: var(--color-text-secondary);
+  }
+
+  .post-title {
+    font-family: var(--font-heading);
+    font-size: 1.125rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.3;
+    transition: color 0.15s ease;
+  }
+
+  .post-description {
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    color: var(--color-text-secondary);
+    line-height: 1.5;
+  }
+
+  .post-item time {
+    font-family: var(--font-heading);
+    font-size: 0.75rem;
+    color: var(--color-text-tertiary);
+    margin-top: var(--space-xs);
+  }
+
+  .pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: var(--space-xl);
+    padding-top: var(--space-lg);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .pagination-link {
+    font-family: var(--font-heading);
+    font-size: 0.8125rem;
+    color: var(--color-text-secondary);
+    text-decoration: none;
+  }
+
+  .pagination-link:hover {
+    color: var(--color-text);
+  }
+
+  .pagination-info {
+    font-family: var(--font-heading);
+    font-size: 0.75rem;
+    color: var(--color-text-tertiary);
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-top: var(--space-xl);
+    font-family: var(--font-heading);
+    font-size: 0.8125rem;
+    color: var(--color-text-tertiary);
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    color: var(--color-text);
+  }
+</style>

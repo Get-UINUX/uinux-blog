@@ -12,6 +12,13 @@ dist/
 .env.*
 !.env.example
 
+# Lock files — project uses pnpm, ignore npm lockfile
+package-lock.json
+
+# Screenshots
+*.png
+!public/*.png
+
 # OS
 .DS_Store
 Thumbs.db

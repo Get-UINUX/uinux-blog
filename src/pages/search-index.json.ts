@@ -1,10 +1,8 @@
 import type { APIContext } from "astro";
-import { getCollection } from "astro:content";
+import { getPublishedPosts } from "../lib/posts";
 
 export async function GET(context: APIContext) {
-  const posts = (await getCollection("posts")).sort(
-    (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
-  );
+  const posts = await getPublishedPosts();
 
   const index = posts.map((post) => ({
     slug: post.id,

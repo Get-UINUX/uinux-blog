@@ -1,0 +1,13 @@
+diff --git a/node_modules/@astrojs/rss/dist/index.js b/node_modules/@astrojs/rss/dist/index.js
+index 22d880c..f3a5f5f 100644
+--- a/node_modules/@astrojs/rss/dist/index.js
++++ b/node_modules/@astrojs/rss/dist/index.js
+@@ -3,7 +3,7 @@ import { XMLBuilder, XMLParser } from "fast-xml-parser";
+ import colors from "piccolore";
+ import { rssSchema } from "./schema.js";
+ import { createCanonicalURL, errorMap, isValidURL } from "./util.js";
+-const globResultValidator = z.record(z.function().returns(z.promise(z.any())));
++const globResultValidator = z.record(z.custom((val) => typeof val === "function"));
+ const rssOptionsValidator = z.object({
+   title: z.string(),
+   description: z.string(),

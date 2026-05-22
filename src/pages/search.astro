@@ -39,9 +39,16 @@ import Heading from "../components/Heading.astro";
 
   async function loadIndex(): Promise<void> {
     if (loaded) return;
-    const res = await fetch("/search-index.json");
-    index = await res.json();
-    loaded = true;
+    try {
+      const res = await fetch("/search-index.json");
+      if (!res.ok) throw new Error(`Failed to load search index: ${res.status}`);
+      index = await res.json();
+      loaded = true;
+    } catch (err) {
+      console.error(err);
+      emptyMsg.textContent = "Search is unavailable. Please try again later.";
+      emptyMsg.hidden = false;
+    }
   }
 
   function search(query: string): SearchEntry[] {
@@ -173,20 +180,21 @@ import Heading from "../components/Heading.astro";
     color: var(--color-text-tertiary);
   }
 
-  .search-results {
+  #search-results {
     list-style: none;
     padding: 0;
   }
 
-  .search-result-item {
+  /* :global needed — items are created dynamically via JS and don't receive Astro's scoped hash */
+  :global(.search-result-item) {
     border-bottom: 1px solid var(--color-border);
   }
 
-  .search-result-item:first-child {
+  :global(.search-result-item:first-child) {
     border-top: 1px solid var(--color-border);
   }
 
-  .search-result-item a {
+  :global(.search-result-item a) {
     display: flex;
     flex-direction: column;
     gap: var(--space-xs);
@@ -195,11 +203,11 @@ import Heading from "../components/Heading.astro";
     color: var(--color-text);
   }
 
-  .search-result-item a:hover .result-title {
+  :global(.search-result-item a:hover .result-title) {
     color: var(--color-text-secondary);
   }
 
-  .result-title {
+  :global(.result-title) {
     font-family: var(--font-heading);
     font-size: 1.125rem;
     font-weight: 600;
@@ -208,21 +216,21 @@ import Heading from "../components/Heading.astro";
     transition: color 0.15s ease;
   }
 
-  .result-description {
+  :global(.result-description) {
     font-family: var(--font-body);
     font-size: 0.9375rem;
     color: var(--color-text-secondary);
     line-height: 1.5;
   }
 
-  .search-result-item time {
+  :global(.search-result-item time) {
     font-family: var(--font-heading);
     font-size: 0.75rem;
     color: var(--color-text-tertiary);
     margin-top: var(--space-xs);
   }
 
-  .result-snippet {
+  :global(.result-snippet) {
     font-family: var(--font-body);
     font-size: 0.8125rem;
     color: var(--color-text-tertiary);

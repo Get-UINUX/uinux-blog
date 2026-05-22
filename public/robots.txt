@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://uinuxblog.getuinux.com/sitemap-index.xml

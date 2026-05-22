@@ -1,0 +1,37 @@
+---
+import Layout from "../components/Layout.astro";
+import Heading from "../components/Heading.astro";
+---
+
+<Layout title="404 — Page Not Found — UINUX Blog" description="The page you're looking for doesn't exist.">
+  <section class="not-found">
+    <Heading as="h1">404</Heading>
+    <p class="message">This page doesn't exist.</p>
+    <a href="/" class="home-link">← Back to home</a>
+  </section>
+</Layout>
+
+<style>
+  .not-found {
+    max-width: var(--width-content);
+  }
+
+  .message {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    color: var(--color-text-secondary);
+    margin-top: var(--space-sm);
+    margin-bottom: var(--space-xl);
+  }
+
+  .home-link {
+    font-family: var(--font-heading);
+    font-size: 0.875rem;
+    color: var(--color-text-tertiary);
+    text-decoration: none;
+  }
+
+  .home-link:hover {
+    color: var(--color-text);
+  }
+</style>
